@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
+  #   networks:
+  #     - backend
+
+  auth-service:
+    build:
+      context: ./projects/auth-service
+      dockerfile: Dockerfile.dev
+    container_name: auth-service
+    env_file:
+      - ./projects/auth-service/.env
+    ports:
+    - "${AUTH_HTTP_PORT}:${AUTH_HTTP_PORT}"
+    - "${AUTH_GRPC_PORT}:${AUTH_GRPC_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  individual-service:
+    build:
+      context: ./projects/individual-service
+      dockerfile: Dockerfile.dev
+    container_name: individual-service
+    env_file:
+      - ./projects/individual-service/.env
+    ports:
+    - "${INDIVIDUAL_HTTP_PORT}:${INDIVIDUAL_HTTP_PORT}"
+    - "${INDIVIDUAL_GRPC_PORT}:${INDIVIDUAL_GRPC_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  business-service:
+    build:
+      context: ./projects/business-service
+      dockerfile: Dockerfile.dev
+    container_name: business-service
+    env_file:
+      - ./projects/business-service/.env
+    ports:
+    - "${BUSINESS_HTTP_PORT}:${BUSINESS_HTTP_PORT}"
+    - "${BUSINESS_GRPC_PORT}:${BUSINESS_GRPC_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  connection-service:
+    build:
+      context: ./projects/connection-service
+      dockerfile: Dockerfile.dev
+    container_name: connection-service
+    env_file:
+      - ./projects/connection-service/.env
+    ports:
+    - "${CONNECTION_HTTP_PORT}:${CONNECTION_HTTP_PORT}"
+    - "${CONNECTION_GRPC_PORT}:${CONNECTION_GRPC_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  notification-service:
+    build:
+      context: ./projects/notification-service
+      dockerfile: Dockerfile.dev
+    container_name: notification-service
+    env_file:
+      - ./projects/notification-service/.env
+    ports:
+    - "${NOTIFICATION_HTTP_PORT}:${NOTIFICATION_HTTP_PORT}"
+    - "${NOTIFICATION_GRPC_PORT}:${NOTIFICATION_GRPC_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+volumes:
+  data:
+
+networks:
+  backend:
+    driver: bridge
