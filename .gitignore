@@ -1,8 +1,5 @@
 /projects/*
 !/projects/.gitkeep
 
-/data/postgres/*
-!/data/postgres/.gitkeep
-
-/data/redis/*
-!/data/redis/.gitkeep
+/data/*
+!/data/.gitkeep
