@@ -36,14 +36,15 @@ services:
       - backend
   
   migrate:
-    image: migrate/migrate:v4.17.0
+    image: migrate/migrate:latest
     container_name: migrate
-    entrypoint: ["/bin/sh", "-c"]
-    command: "tail -f /dev/null"  # Keeps it alive for manual exec
-    depends_on:
-      - postgres
     networks:
       - backend
+    entrypoint: ["sleep", "infinity"]  # keep container alive to exec commands
+    volumes:
+      - ./projects:/projects
+    depends_on:
+      - postgres
 
   # rabbitmq:
   #   image: rabbitmq:3-management
