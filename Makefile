@@ -6,7 +6,7 @@ DB_PASSWORD    ?= postgres
 MIGRATIONS_BASE ?= projects
 MIGRATIONS_DIR  ?= internal/adapter/storage/postgres/migrations
 
-# Example: make migrate-create name=create_users service=auth-service
+# Example: make migration name=create_users service=auth-service
 migration:
 	@if [ -z "$(name)" ] || [ -z "$(service)" ]; then \
 		echo "❌ Usage: make migration name=your_migration_name service=your-service"; \
