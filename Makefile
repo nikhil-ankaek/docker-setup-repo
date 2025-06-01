@@ -8,8 +8,12 @@ MIGRATIONS_DIR  ?= internal/adapter/storage/postgres/migrations
 
 # Example: make migration name=create_users service=auth-service
 migration:
-	@if [ -z "$(name)" ] || [ -z "$(service)" ]; then \
-		echo "❌ Usage: make migration name=your_migration_name service=your-service"; \
+	@if [ -z "$(name)" ]; then \
+		echo "❌ Usage: make migration name=your_migration_name service=your-service-name"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(service)" ]; then \
+		echo "❌ Please specify the service container. Example: service=your-service"; \
 		exit 1; \
 	fi; \
 	docker exec -i migrate mkdir -p /migrations/$(service); \
@@ -20,8 +24,12 @@ migration:
 
 # Example: make migrate-up service=auth-service DB_NAME=auth_db
 migrate-up:
-	@if [ -z "$(service)" ] || [ -z "$(DB_NAME)" ]; then \
-		echo "❌ Usage: make migrate-up service=your-service DB_NAME=your_db"; \
+	@if [ -z "$(name)" ]; then \
+		echo "❌ Usage: make migration name=your_migration_name service=your-service-name"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(service)" ]; then \
+		echo "❌ Please specify the service container. Example: service=your-service"; \
 		exit 1; \
 	fi; \
 	docker cp $(MIGRATIONS_BASE)/$(service)/$(MIGRATIONS_DIR) migrate:/migrations/$(service); \
@@ -30,8 +38,12 @@ migrate-up:
 
 # Example: make migrate-down service=auth-service DB_NAME=auth_db
 migrate-down:
-	@if [ -z "$(service)" ] || [ -z "$(DB_NAME)" ]; then \
-		echo "❌ Usage: make migrate-down service=your-service DB_NAME=your_db"; \
+	@if [ -z "$(name)" ]; then \
+		echo "❌ Usage: make migration name=your_migration_name service=your-service-name"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(service)" ]; then \
+		echo "❌ Please specify the service container. Example: service=your-service"; \
 		exit 1; \
 	fi; \
 	docker cp $(MIGRATIONS_BASE)/$(service)/$(MIGRATIONS_DIR) migrate:/migrations/$(service); \
